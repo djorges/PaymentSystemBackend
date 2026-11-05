@@ -12,27 +12,42 @@ import org.example.paymentsystem.entity.enums.TokenType;
  * Author: djorges
  * Date: 02/07/2025
  */
+
 @Data
 @Entity
-@Table(name = "tokens")
+@Table(
+    name = "tokens",
+    indexes = {
+        @Index(name = "idx_token_user", columnList = "user_id"),
+        @Index(name = "idx_token_status", columnList = "expired, revoked")
+    }
+)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 512)
     private String token;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TokenType tokenType = TokenType.BEARER;
 
-    private boolean revoked;
-    private boolean expired;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean revoked = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean expired = false;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 }

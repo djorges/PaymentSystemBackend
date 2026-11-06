@@ -15,24 +15,31 @@ import java.util.List;
  * Date: 02/07/2025
  */
 
-@Data
 @Entity
+@Table(name = "users")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
 public class UserEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true, length = 180)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<TokenEntity> tokens = new ArrayList<>();
 }

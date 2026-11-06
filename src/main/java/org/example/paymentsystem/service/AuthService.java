@@ -102,20 +102,22 @@ public class AuthService implements UserDetailsService {
     }
 
     // 2. Cerrar sesión actual
-    public void logout(HttpServletRequest request) {
+    
+public void logout(HttpServletRequest request) {
 
-        String token = extractBearerToken(request);
+    String token = extractBearerToken(request);
 
-        if (token == null) {
-            return;
-        }
-
-        tokenRepository.findByToken(token).ifPresent(storedToken -> {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-        });
+    if (token == null) {
+        return;
     }
+
+    String email = jwtService.extractUsername(token);
+
+    var user = getUserByEmail(email);
+
+    revokeAllUserTokens(user);
+}
+
 
     // 3. Cerrar todas las sesiones
     public void logoutAll(Long userId) {
